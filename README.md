@@ -6,6 +6,10 @@ If you're looking at this, you're probably asking "WHY???". Well, a need arose t
 
 That's what this does: it's a TCP server that acts as a simple mutex, ensuring only one client can obtain the lock at a time. It's also a corresponding client that works with the server and will fire off whatever work you give it when it has the lock. It's all written in bash, so there are no real dependencies other than running it somewhere that has bash and a few, common Linux tools.
 
+## Caveat
+
+There is one, small caveat, though. Since different versions of netcat have drastically different options for some things, the way it's used here might not work everywhere. You might need to tweak the options so that the connection gets closed in your netcat implementation. If the client connects to the server and hangs indefinitely, that's probably what's going on.
+
 ## How?
 
 Briefly, the server runs and listens on a TCP port for a "lock" message. When it receives one, it grants the lock to the caller and closes that port. Then it listens on a different TCP port for an "unlock" message. When it receives one, it closes the second port and opens the first one again. Rinse and repeat. Which port is open indicates the state of the server.
@@ -97,4 +101,10 @@ Then gather up all the `locks.log` files. If you put them all under a directory 
 ```bash
 unset prev_start prev_end failed; while read -r -a range; do start="${range[0]}"; end="${range[1]}"; echo -n "$start - $end "; if [ -z "$prev_start" ]; then echo "First line!"; prev_start="$start"; prev_end="$end"; else echo -n "is $prev_end < $start? "; if [ "$prev_end" -lt "$start" ]; then echo yep; else echo nope; failed=true; fi; fi; prev_start="$start"; prev_end="$end"; done < <(cat locks/* | sort -k 6 | awk '{print $6 " " $8}'); [ -z "$failed" ] || echo "There was an overlap!"
 ```
+
+### The client connected to the server, but then it hangs forever.
+
+1. That's not a question.
+
+2. It's probably because your netcat implementation differs from the one where I wrote this. Different netcats have different ways of saying "close the connection after sending/receiving some data. Figure out what's right for your system and change the netcat options appropriately. A google search for "make netcat close the connection" should be illuminating.
 
