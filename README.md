@@ -1,3 +1,5 @@
+![shellcheck workflow](https://github.com/zzantozz/bash-mutex-server/actions/workflows/shellcheck.yml/badge.svg)
+
 # Bash Mutex Server
 
 If you're looking at this, you're probably asking "WHY???". Well, a need arose to coordinate some work across multiple machines, and I didn't want to take the time to set up zookeeper, etcd, or anything like that. I wanted a very simple, non-intrusive locking system that would ensure only one server could do some action at a time.
