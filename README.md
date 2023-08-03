@@ -138,6 +138,6 @@ unset prev_start prev_end failed; while read -r -a range; do start="${range[0]}"
 1. That's not a question.
 
 2. It's probably because your netcat implementation differs from the one where I wrote this. Different netcats have
-   different ways of saying "close the connection after sending/receiving some data. Figure out what's right for your
+   different ways of saying "close the connection after sending/receiving some data". Figure out what's right for your
    system and change the netcat options appropriately. A google search for "make netcat close the connection" should be
    illuminating.
