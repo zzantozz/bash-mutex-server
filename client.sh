@@ -3,11 +3,15 @@
 ###
 # A client for the simple, no-dependencies tcp mutex server.
 #
-# This waits to obtain a lock from the companion lock server. When it obtains the lock, it forks a configurable action
-# script to the background and then polls for completion by periodically calling a configurable "finished" script. When
-# the finished script returns success (status code 0), it releases the lock and exits.
+# This waits to obtain a lock from the companion lock server. When it obtains the lock, it runs a configurable action
+# script. When the script finishes, it releases the lock and exits.
 #
 # In case it fails to obtain the lock, it sleeps for a while and tries again.
+#
+# You can optionally also configure a "finished test" that will run after the action to be sure it's finished. This is
+# useful in the case that the action causes some asynchronous, background effects that you need to be sure are finished.
+# The finished test is polled until it returns success (status code 0). The lock isn't released until the finished test
+# is successful.
 #
 # The client has sane defaults so that if you run it and the companion server on the same machine, they'll work together
 # and demonstrate how the system works. Use environment variables to override important settings, like where to reach
@@ -37,9 +41,9 @@ until [ "$work_done" = true ]; do
   response=$(echo "$lock_msg" | nc -w2 "$server_addr" "$lock_port")
   # Only if the server specifically responded, proceed.
   if [ "$response" = oklocked ]; then
-    # Run the work in the background, and poll for completion. This uses two different scripts. One will have to know
-    # how the other works.
-    eval "$action" &
+    # Do the work.
+    eval "$action"
+    # Check that everything is finished, in case the action isn't fully synchronous.
     while ! eval "$finished_test"; do
       sleep "$sleep_between_finish_tests"
     done

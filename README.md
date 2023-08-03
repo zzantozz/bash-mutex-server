@@ -74,11 +74,11 @@ In addition, you can configure how the client identifies itself to the server (f
 
 Finally, you have to configure the client with the work you want it to do *and* how to know when the work is finished. For my use case, I couldn't just run a simple command and wait for it to finish. The "finished" condition is separate from the command to run.
 
-- `ACTION`: the action to take when the client gets the lock. This is any valid command. The client runs `eval "$action" &` to start it, putting it in the background. Default: `true`
+- `ACTION`: the action to take when the client gets the lock. This is any valid command. The client runs `eval "$action"` to start it. Default: `true`
 
 - `FINISHED_TEST`: a command to test if the action has finished so the client can release the lock. This is also any valid command, which is run as `eval "$finished_test"`. The action is considered finished when this command exits with status code 0. Default: `true`
 
-- `SLEEP_BETWEEN_FINISH_TESTS`: time, in seconds, to wait between finish tests. The first test runs immediately after starting the action in the background. Then the client waits in a loop for the "finished test" to exit with status code 0. This is how long it waits between tests. Default: 10
+- `SLEEP_BETWEEN_FINISH_TESTS`: time, in seconds, to wait between finish tests. The first test runs immediately after the action completes. Then the client waits in a loop for the "finished test" to exit with status code 0. This is how long it waits between tests. Default: 10
 
 ## FAQs
 
